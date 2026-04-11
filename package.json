@@ -1,0 +1,22 @@
+{
+  "name": "higgsfield-mcp",
+  "version": "0.1.0",
+  "description": "MCP server for Higgsfield AI cinematic image and video generation",
+  "type": "module",
+  "main": "src/server.js",
+  "bin": {
+    "higgsfield-mcp": "src/server.js"
+  },
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.1",
+    "dotenv": "^16.4.7"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
