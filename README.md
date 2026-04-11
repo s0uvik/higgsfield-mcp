@@ -26,35 +26,34 @@ Every generation call is async — you fire it, receive a `job_set_id`, and poll
 
 ### 2. Install
 
+**Option A — npm global install (recommended):**
+
 ```bash
+npm install -g higgsfield-mcp
+```
+
+**Option B — run without installing:**
+
+```bash
+npx higgsfield-mcp
+```
+
+**Option C — from source:**
+
+```bash
+git clone https://github.com/Storyvord/higgsfield-mcp.git
 cd higgsfield-mcp
 npm install
 ```
 
-### 3. Credentials
+### 3. Get Your API Keys
 
-Copy the template and fill in your keys:
+1. Go to <https://cloud.higgsfield.ai/api-keys>
+2. Create or copy your **API Key** and **Secret**
 
-```bash
-cp .env.example .env
-```
+### 4. Connect to an MCP Client
 
-```env
-HF_API_KEY=hf_xxxxxxxxxxxx
-HF_SECRET=sk_xxxxxxxxxxxx
-```
-
-### 4. Run
-
-```bash
-npm start
-```
-
-The server starts on **stdio** — pipe it into any MCP host.
-
----
-
-## Connecting to Claude Desktop
+#### Claude Desktop
 
 Edit your Claude Desktop config:
 
@@ -65,9 +64,8 @@ Edit your Claude Desktop config:
 {
   "mcpServers": {
     "higgsfield": {
-      "command": "node",
-      "args": ["src/server.js"],
-      "cwd": "/full/path/to/higgsfield-mcp",
+      "command": "npx",
+      "args": ["-y", "higgsfield-mcp"],
       "env": {
         "HF_API_KEY": "hf_xxxxxxxxxxxx",
         "HF_SECRET": "sk_xxxxxxxxxxxx"
@@ -78,6 +76,46 @@ Edit your Claude Desktop config:
 ```
 
 Restart Claude Desktop after saving.
+
+#### Claude Code (CLI)
+
+```bash
+claude mcp add higgsfield -- npx -y higgsfield-mcp
+```
+
+Then set your environment variables before running Claude Code:
+
+```bash
+export HF_API_KEY=hf_xxxxxxxxxxxx
+export HF_SECRET=sk_xxxxxxxxxxxx
+```
+
+#### Cursor / VS Code
+
+Add to your `.cursor/mcp.json` or `.vscode/mcp.json`:
+
+```json
+{
+  "mcpServers": {
+    "higgsfield": {
+      "command": "npx",
+      "args": ["-y", "higgsfield-mcp"],
+      "env": {
+        "HF_API_KEY": "hf_xxxxxxxxxxxx",
+        "HF_SECRET": "sk_xxxxxxxxxxxx"
+      }
+    }
+  }
+}
+```
+
+#### From Source (with .env file)
+
+```bash
+cp .env.example .env
+# Edit .env with your keys
+npm start
+```
 
 ---
 
@@ -252,7 +290,3 @@ higgsfield-mcp/
 - MCP TypeScript SDK — <https://github.com/modelcontextprotocol/typescript-sdk>
 
 ---
-
-## License
-
-MIT
