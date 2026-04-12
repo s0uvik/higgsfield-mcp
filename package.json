@@ -29,9 +29,9 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Storyvord/higgsfield-mcp.git"
+    "url": "git+https://github.com/s0uvik/higgsfield-mcp.git"
   },
-  "homepage": "https://github.com/Storyvord/higgsfield-mcp#readme",
+  "homepage": "https://github.com/s0uvik/higgsfield-mcp#readme",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.12.1",
     "dotenv": "^16.4.7"

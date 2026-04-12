@@ -38,14 +38,6 @@ npm install -g higgsfield-mcp
 npx higgsfield-mcp
 ```
 
-**Option C — from source:**
-
-```bash
-git clone https://github.com/Storyvord/higgsfield-mcp.git
-cd higgsfield-mcp
-npm install
-```
-
 ### 3. Get Your API Keys
 
 1. Go to <https://cloud.higgsfield.ai/api-keys>
@@ -107,14 +99,6 @@ Add to your `.cursor/mcp.json` or `.vscode/mcp.json`:
     }
   }
 }
-```
-
-#### From Source (with .env file)
-
-```bash
-cp .env.example .env
-# Edit .env with your keys
-npm start
 ```
 
 ---
