@@ -48,6 +48,30 @@ export class HiggsfieldClient {
     return this._request("POST", path, { body });
   }
 
+  // ── File Upload ───────────────────────────────────────────────────────────
+
+  async uploadFile(bytes, contentType = "image/jpeg") {
+    // Phase 1: get presigned upload URL
+    const { public_url, upload_url } = await this._request("POST", "/files/generate-upload-url", {
+      body: { content_type: contentType },
+    });
+
+    // Phase 2: PUT raw bytes to presigned URL (no auth header — embedded in URL)
+    const res = await fetch(upload_url, {
+      method: "PUT",
+      headers: { "Content-Type": contentType },
+      body: bytes,
+      signal: AbortSignal.timeout(60000),
+    });
+
+    if (!res.ok) {
+      const text = await res.text().catch(() => "");
+      throw new Error(`Upload failed HTTP ${res.status}: ${text}`);
+    }
+
+    return public_url;
+  }
+
   // ── Old API (v1) ──────────────────────────────────────────────────────────
 
   async generateImage({

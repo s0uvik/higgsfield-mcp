@@ -138,6 +138,12 @@ Add to your `.cursor/mcp.json` or `.vscode/mcp.json`:
 | `get_character`    | Single character by ID                                       |
 | `delete_character` | Permanently delete a character                               |
 
+### Upload
+
+| Tool | Notes |
+|------|-------|
+| `upload_image` | Upload base64 image → get public URL for use in generation tools |
+
 ### Lookup
 
 | Tool                | Notes                               |

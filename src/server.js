@@ -847,6 +847,54 @@ server.tool(
 );
 
 // ============================================================================
+// TOOLS — FILE UPLOAD
+// ============================================================================
+
+server.tool(
+  "upload_image",
+  "Upload an image to Higgsfield hosting and get a public URL. Pass the image as a base64 string. Returns a public_url you can use in any generation tool.",
+  {
+    image_base64: z.string().describe("Base64-encoded image data (no data URI prefix — raw base64 only)"),
+    content_type: z
+      .enum(["image/jpeg", "image/png", "image/webp"])
+      .default("image/jpeg")
+      .describe("MIME type of the image"),
+  },
+  async ({ image_base64, content_type }) => {
+    try {
+      const bytes = Buffer.from(image_base64, "base64");
+      const public_url = await client.uploadFile(bytes, content_type);
+
+      return {
+        content: [
+          {
+            type: "text",
+            text: JSON.stringify(
+              {
+                success: true,
+                public_url,
+                message: "Image uploaded. Use public_url in any generation tool.",
+              },
+              null,
+              2
+            ),
+          },
+        ],
+      };
+    } catch (e) {
+      return {
+        content: [
+          {
+            type: "text",
+            text: JSON.stringify({ success: false, error: e.message }, null, 2),
+          },
+        ],
+      };
+    }
+  }
+);
+
+// ============================================================================
 // TOOLS — DEBUG
 // ============================================================================
 
