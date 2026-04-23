@@ -1,6 +1,5 @@
 /**
  * Higgsfield AI API Client
- * Async wrapper for the Higgsfield AI platform API
  */
 
 const BASE_URL = "https://platform.higgsfield.ai";
@@ -8,9 +7,11 @@ const BASE_URL = "https://platform.higgsfield.ai";
 export class HiggsfieldClient {
   constructor(apiKey, secret, baseUrl = BASE_URL) {
     this.baseUrl = baseUrl;
+    this.apiKey = apiKey;
     this.headers = {
       "hf-api-key": apiKey,
       "hf-secret": secret,
+      Authorization: `Key ${apiKey}:${secret}`,
       "Content-Type": "application/json",
       Accept: "application/json",
     };
@@ -38,6 +39,16 @@ export class HiggsfieldClient {
     }
     return res.json();
   }
+
+  // New unified generation API: POST /{model_id}
+  async _generate(modelId, body, webhookUrl) {
+    const path = webhookUrl
+      ? `/${modelId}?hf_webhook=${encodeURIComponent(webhookUrl)}`
+      : `/${modelId}`;
+    return this._request("POST", path, { body });
+  }
+
+  // ── Old API (v1) ──────────────────────────────────────────────────────────
 
   async generateImage({
     prompt,
@@ -122,17 +133,6 @@ export class HiggsfieldClient {
     return this._request("POST", "/v1/speak/higgsfield", { body });
   }
 
-  async createCharacter(name, imageUrls) {
-    const body = {
-      name,
-      input_images: imageUrls.map((url) => ({
-        type: "image_url",
-        image_url: url,
-      })),
-    };
-    return this._request("POST", "/v1/custom-references", { body });
-  }
-
   async getJobResults(jobSetId) {
     return this._request("GET", `/v1/job-sets/${jobSetId}`);
   }
@@ -143,6 +143,17 @@ export class HiggsfieldClient {
 
   async listMotions() {
     return this._request("GET", "/v1/motions");
+  }
+
+  async createCharacter(name, imageUrls) {
+    const body = {
+      name,
+      input_images: imageUrls.map((url) => ({
+        type: "image_url",
+        image_url: url,
+      })),
+    };
+    return this._request("POST", "/v1/custom-references", { body });
   }
 
   async listCharacters(page = 1, pageSize = 20) {
@@ -157,5 +168,55 @@ export class HiggsfieldClient {
 
   async deleteCharacter(characterId) {
     return this._request("DELETE", `/v1/custom-references/${characterId}`);
+  }
+
+  // ── New unified API ───────────────────────────────────────────────────────
+
+  async getRequestStatus(requestId) {
+    return this._request("GET", `/requests/${requestId}/status`);
+  }
+
+  async cancelRequest(requestId) {
+    return this._request("POST", `/requests/${requestId}/cancel`);
+  }
+
+  async generateImageReve({ prompt, aspectRatio = "16:9", resolution = "1080p", webhookUrl } = {}) {
+    return this._generate("reve/text-to-image", { prompt, aspect_ratio: aspectRatio, resolution }, webhookUrl);
+  }
+
+  async generateImageSeedream({ prompt, aspectRatio = "16:9", resolution = "1080p", cameraFixed, webhookUrl } = {}) {
+    const body = { prompt, aspect_ratio: aspectRatio, resolution };
+    if (cameraFixed !== undefined) body.camera_fixed = cameraFixed;
+    return this._generate("bytedance/seedream/v4/text-to-image", body, webhookUrl);
+  }
+
+  async editImageSeedream({ prompt, aspectRatio = "16:9", resolution = "1080p", webhookUrl } = {}) {
+    return this._generate(
+      "bytedance/seedream/v4/edit",
+      { prompt, aspect_ratio: aspectRatio, resolution },
+      webhookUrl
+    );
+  }
+
+  async generateVideoKling({ imageUrl, prompt, webhookUrl } = {}) {
+    return this._generate(
+      "kling-video/v2.1/pro/image-to-video",
+      { image_url: imageUrl, prompt },
+      webhookUrl
+    );
+  }
+
+  async generateVideoSeedance({ imageUrl, prompt, webhookUrl } = {}) {
+    return this._generate(
+      "bytedance/seedance/v1/pro/image-to-video",
+      { image_url: imageUrl, prompt },
+      webhookUrl
+    );
+  }
+
+  async generateVideoDopStandard({ imageUrl, prompt, duration, webhookUrl } = {}) {
+    const body = { image_url: imageUrl, prompt };
+    if (duration) body.duration = duration;
+    return this._generate("higgsfield-ai/dop/standard", body, webhookUrl);
   }
 }
